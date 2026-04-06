@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Social Bond Analyzer</title>
+  <link rel="stylesheet" href="src/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div id="app">
+
+    <!-- LANDING / UPLOAD SCREEN -->
+    <div id="screen-upload" class="screen active">
+      <div class="hero">
+        <div class="hero-tag">✦ social bond analyzer</div>
+        <h1 class="hero-title">Your friendship<br><span>receipts.</span></h1>
+        <p class="hero-sub">Upload your chat exports and find out who really shows up, who ghosts, who makes you laugh, and who's the chaos agent.</p>
+      </div>
+
+      <div class="upload-sources">
+        <div class="section-label">connect your data</div>
+        <div class="upload-grid">
+
+          <label class="upload-card" data-source="imessage">
+            <input type="file" accept=".db,.csv,.txt,.json" data-type="imessage" hidden />
+            <div class="uc-icon">💬</div>
+            <div class="uc-name">iMessage</div>
+            <div class="uc-hint">.db or .csv export</div>
+            <div class="uc-status">Click to upload</div>
+          </label>
+
+          <label class="upload-card" data-source="whatsapp">
+            <input type="file" accept=".txt,.zip,.json" data-type="whatsapp" hidden />
+            <div class="uc-icon">📱</div>
+            <div class="uc-name">WhatsApp</div>
+            <div class="uc-hint">_chat.txt export</div>
+            <div class="uc-status">Click to upload</div>
+          </label>
+
+          <label class="upload-card" data-source="instagram">
+            <input type="file" accept=".json,.zip" data-type="instagram" hidden />
+            <div class="uc-icon">📸</div>
+            <div class="uc-name">Instagram DMs</div>
+            <div class="uc-hint">messages.json</div>
+            <div class="uc-status">Click to upload</div>
+          </label>
+
+          <label class="upload-card" data-source="twitter">
+            <input type="file" accept=".js,.json,.zip" data-type="twitter" hidden />
+            <div class="uc-icon">𝕏</div>
+            <div class="uc-name">Twitter DMs</div>
+            <div class="uc-hint">direct-messages.js</div>
+            <div class="uc-status">Click to upload</div>
+          </label>
+
+        </div>
+
+        <div class="privacy-note">
+          🔒 Everything is processed locally in your browser. No data is ever uploaded to any server.
+        </div>
+
+        <div class="demo-row">
+          <button class="demo-btn" id="loadDemoBtn">Try with demo data →</button>
+          <span class="demo-label">or upload real exports above</span>
+        </div>
+      </div>
+
+      <div class="how-to">
+        <div class="section-label">how to export your chats</div>
+        <div class="how-grid">
+          <div class="how-card">
+            <div class="how-title">💬 iMessage</div>
+            <ol>
+              <li>Use <a href="https://imazing.com" target="_blank">iMazing</a> (free trial)</li>
+              <li>Select device → Messages</li>
+              <li>Export as CSV or JSON</li>
+            </ol>
+          </div>
+          <div class="how-card">
+            <div class="how-title">📱 WhatsApp</div>
+            <ol>
+              <li>Open any chat</li>
+              <li>Tap ··· → More → Export chat</li>
+              <li>Choose "Without Media"</li>
+            </ol>
+          </div>
+          <div class="how-card">
+            <div class="how-title">📸 Instagram</div>
+            <ol>
+              <li>Settings → Your activity</li>
+              <li>Download your information</li>
+              <li>Select Messages → JSON format</li>
+            </ol>
+          </div>
+          <div class="how-card">
+            <div class="how-title">𝕏 Twitter/X</div>
+            <ol>
+              <li>Settings → Your account</li>
+              <li>Download an archive</li>
+              <li>Find direct-messages.js</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN DASHBOARD SCREEN -->
+    <div id="screen-dashboard" class="screen">
+      <div class="dash-header">
+        <div>
+          <div class="hero-tag" style="margin-bottom:4px">✦ social bond analyzer</div>
+          <h2 class="dash-title">Your <span>Bond Report</span></h2>
+        </div>
+        <button class="back-btn" id="backBtn">← New analysis</button>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" data-tab="overview">Overview</button>
+        <button class="tab" data-tab="people">People</button>
+        <button class="tab" data-tab="tone">Tone</button>
+        <button class="tab" data-tab="awards">Awards</button>
+        <button class="tab" data-tab="search">🔍 Keywords</button>
+      </div>
+
+      <!-- OVERVIEW TAB -->
+      <div id="tab-overview" class="tab-panel active">
+        <div class="callout" id="overview-callout"></div>
+        <div class="section-label">at a glance</div>
+        <div class="stats-grid" id="overview-stats"></div>
+
+        <div class="section-label" style="margin-top:1.5rem">message activity</div>
+        <div class="chart-wrap" style="height:160px">
+          <canvas id="activityChart"></canvas>
+        </div>
+
+        <div class="section-label" style="margin-top:1.5rem">when you text most</div>
+        <div class="heatmap-label">days of week</div>
+        <div class="timeline-row" id="dayHeatmap"></div>
+        <div class="tl-label-row">
+          <div class="tl-label">Mon</div><div class="tl-label">Tue</div><div class="tl-label">Wed</div>
+          <div class="tl-label">Thu</div><div class="tl-label">Fri</div><div class="tl-label">Sat</div><div class="tl-label">Sun</div>
+        </div>
+
+        <div class="section-label" style="margin-top:1.5rem">top closest to you</div>
+        <div class="people-list-wrap" id="top-people-list"></div>
+      </div>
+
+      <!-- PEOPLE TAB -->
+      <div id="tab-people" class="tab-panel">
+        <div class="callout">Sorted by <strong>bond score</strong> — a mix of frequency, response time, who initiates, and conversation depth.</div>
+        <div class="people-list-wrap" id="all-people-list"></div>
+        <div class="section-label" style="margin-top:1.5rem">who starts conversations?</div>
+        <div class="chart-wrap" id="initiator-wrap" style="height:240px">
+          <canvas id="initiatorChart"></canvas>
+        </div>
+      </div>
+
+      <!-- TONE TAB -->
+      <div id="tab-tone" class="tab-panel">
+        <div class="callout" id="tone-callout"></div>
+        <div class="section-label">your outgoing tone breakdown</div>
+        <div id="tone-bars"></div>
+        <div class="section-label" style="margin-top:1.5rem">tone by person</div>
+        <div class="people-list-wrap" id="tone-people"></div>
+        <div class="section-label" style="margin-top:1.5rem">your most-used words</div>
+        <div class="word-cloud" id="wordCloud"></div>
+      </div>
+
+      <!-- AWARDS TAB -->
+      <div id="tab-awards" class="tab-panel">
+        <div class="callout">The <strong>friendship Oscars.</strong> Based on message analysis across all your chats.</div>
+        <div class="mvp-grid" id="awards-grid"></div>
+        <div class="section-label" style="margin-top:1.5rem">friendship radar — top 3</div>
+        <div class="chart-wrap" style="height:220px">
+          <canvas id="radarChart"></canvas>
+        </div>
+      </div>
+
+      <!-- KEYWORD SEARCH TAB -->
+      <div id="tab-search" class="tab-panel">
+        <div class="callout">Search any word, phrase, or emoji across all your conversations and get the full breakdown.</div>
+
+        <div class="search-box-wrap">
+          <input type="text" id="keywordInput" class="search-input" placeholder="e.g. love, lmao, 💀, 'no way'" />
+          <button class="search-btn" id="searchBtn">Search</button>
+        </div>
+
+        <div id="search-results" class="search-results hidden">
+
+          <div class="search-summary" id="search-summary"></div>
+
+          <div class="search-grid">
+            <div>
+              <div class="section-label">who used it most</div>
+              <div class="people-list-wrap" id="keyword-people"></div>
+            </div>
+            <div>
+              <div class="section-label">usage over time</div>
+              <div class="chart-wrap" style="height:160px">
+                <canvas id="keywordTimeChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-label" style="margin-top:1.5rem">recent examples</div>
+          <div id="keyword-examples" class="examples-list"></div>
+
+          <div class="section-label" style="margin-top:1.5rem">context — what surrounds it?</div>
+          <div id="keyword-context" class="context-chips"></div>
+
+        </div>
+
+        <div id="search-empty" class="search-empty">
+          <div class="search-empty-icon">🔍</div>
+          <div>Try searching for words, phrases, or even emoji.<br>Find out who says "bestie" the most or who drops the most 💀</div>
+        </div>
+
+        <div class="section-label" style="margin-top:1.5rem">trending in your chats</div>
+        <div class="trending-chips" id="trendingChips"></div>
+      </div>
+
+    </div><!-- /screen-dashboard -->
+
+  </div><!-- /app -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
